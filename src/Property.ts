@@ -12,20 +12,25 @@ export class Property extends BaseProperty {
   private columnPosition: number;
 
   // eslint-disable-next-line default-param-last
-  constructor(column: DMMF.Field, columnPosition = 0, enums: Enums) {
+  constructor(
+    column: DMMF.Field,
+    columnPosition = 0,
+    enums: Enums,
+    isId: boolean,
+  ) {
     const path = column.name;
-    super({ path });
+    super({ path, isId });
     this.column = column;
     this.enums = enums;
     this.columnPosition = columnPosition;
   }
 
   public isEditable(): boolean {
-    return !this.isId() && this.column.name !== 'createdAt' && this.column.name !== 'updatedAt';
-  }
-
-  public isId(): boolean {
-    return !!this.column.isId;
+    return (
+      !this.isId() &&
+      this.column.name !== 'createdAt' &&
+      this.column.name !== 'updatedAt'
+    );
   }
 
   public name(): string {
@@ -83,11 +88,17 @@ export class Property extends BaseProperty {
   public type(): PropertyType {
     let type: PropertyType = DATA_TYPES[this.column.type];
 
-    if (this.reference()) { type = 'reference'; }
-    if (this.isEnum()) { type = 'string'; }
+    if (this.reference()) {
+      type = 'reference';
+    }
+    if (this.isEnum()) {
+      type = 'string';
+    }
 
     // eslint-disable-next-line no-console
-    if (!type) { console.warn(`Unhandled type: ${this.column.type}`); }
+    if (!type) {
+      console.warn(`Unhandled type: ${this.column.type}`);
+    }
 
     return type;
   }
